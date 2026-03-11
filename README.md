@@ -1,4 +1,4 @@
-## LongTailHook — Adaptive Liquidity for Long‑Tail & Specialized Markets
+# LongTailHook — Adaptive Liquidity for Long‑Tail & Specialized Markets
 
 LongTailHook is a Uniswap v4‑style hook system designed specifically for **illiquid, long‑tail, and specialized asset markets** (memecoins, new project tokens, niche DeFi, RWAs, etc.).
 
