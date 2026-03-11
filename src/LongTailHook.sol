@@ -61,11 +61,7 @@ contract LongTailHook is IMinimalHook {
 
     /// @notice Emitted when suspicious activity is detected for a trader.
     event SuspiciousActivity(
-        address indexed trader,
-        PoolKey indexed key,
-        uint32 tradesInWindow,
-        uint128 volumeInWindow,
-        uint64 highFeeUntil
+        address indexed trader, PoolKey indexed key, uint32 tradesInWindow, uint128 volumeInWindow, uint64 highFeeUntil
     );
 
     /// @notice Manager (in real deployments this would be the Uniswap v4 PoolManager).
@@ -107,15 +103,7 @@ contract LongTailHook is IMinimalHook {
 
     /// @notice Compute a unique key for mapping storage.
     function _poolId(PoolKey calldata key) internal pure returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                key.currency0.addr,
-                key.currency1.addr,
-                key.fee,
-                key.tickSpacing,
-                key.hooks
-            )
-        );
+        return keccak256(abi.encode(key.currency0.addr, key.currency1.addr, key.fee, key.tickSpacing, key.hooks));
     }
 
     // ========= Admin configuration =========
@@ -147,13 +135,7 @@ contract LongTailHook is IMinimalHook {
         });
 
         emit PoolConfigUpdated(
-            key,
-            baseFeeBps,
-            largeTradeFeeBps,
-            lowLiquidityFeeBps,
-            smallTradeSize,
-            largeTradeSize,
-            lowLiquidityThreshold
+            key, baseFeeBps, largeTradeFeeBps, lowLiquidityFeeBps, smallTradeSize, largeTradeSize, lowLiquidityThreshold
         );
     }
 
@@ -194,28 +176,14 @@ contract LongTailHook is IMinimalHook {
 
         uint256 tradeSize = _normalizedTradeSize(params.amountSpecified);
 
-        uint24 adaptiveFee = _computeAdaptiveFee(
-            id,
-            config,
-            tradeSize
-        );
+        uint24 adaptiveFee = _computeAdaptiveFee(id, config, tradeSize);
 
-        uint24 liquidityFee = _computeLiquidityFee(
-            key,
-            config
-        );
+        uint24 liquidityFee = _computeLiquidityFee(key, config);
 
-        uint24 velocityFee = _updateTraderAndComputeVelocityFee(
-            id,
-            sender,
-            tradeSize
-        );
+        uint24 velocityFee = _updateTraderAndComputeVelocityFee(id, sender, tradeSize);
 
         // Total fee in basis points.
-        uint24 totalFeeBps = config.baseFeeBps
-            + adaptiveFee
-            + liquidityFee
-            + velocityFee;
+        uint24 totalFeeBps = config.baseFeeBps + adaptiveFee + liquidityFee + velocityFee;
 
         if (totalFeeBps > 3_000) {
             // Hard cap at 30% to avoid pathological behaviour.
@@ -240,10 +208,15 @@ contract LongTailHook is IMinimalHook {
     ///      - Small trades: effectively "flatter" curve (low marginal fee)
     ///      - Large trades: steeper curve (additional fee component)
     function _computeAdaptiveFee(
-        bytes32 /*id*/,
+        bytes32,
+        /*id*/
         PoolConfig memory config,
         uint256 tradeSize
-    ) internal pure returns (uint24) {
+    )
+        internal
+        pure
+        returns (uint24)
+    {
         if (tradeSize <= config.smallTradeSize) {
             // Extremely small additional fee: effectively flat pricing region.
             return 0;
@@ -263,10 +236,7 @@ contract LongTailHook is IMinimalHook {
 
     /// @notice Liquidity-aware fee modulation.
     /// @dev When pool liquidity is low, add extra fee to compensate LPs.
-    function _computeLiquidityFee(
-        PoolKey calldata key,
-        PoolConfig memory config
-    ) internal view returns (uint24) {
+    function _computeLiquidityFee(PoolKey calldata key, PoolConfig memory config) internal view returns (uint24) {
         if (config.lowLiquidityThreshold == 0) return 0;
 
         uint128 liquidity = poolManager.getLiquidity(key);
@@ -278,11 +248,10 @@ contract LongTailHook is IMinimalHook {
     }
 
     /// @notice Updates trader statistics and returns a velocity-based fee component.
-    function _updateTraderAndComputeVelocityFee(
-        bytes32 id,
-        address trader,
-        uint256 tradeSize
-    ) internal returns (uint24) {
+    function _updateTraderAndComputeVelocityFee(bytes32 id, address trader, uint256 tradeSize)
+        internal
+        returns (uint24)
+    {
         VelocityConfig memory vcfg = velocityConfig;
         TraderStats storage stats = traderStats[id][trader];
 

@@ -45,12 +45,7 @@ library HookFlags {
 
 /// @notice Minimal hook interface with only the callbacks we actually use.
 interface IMinimalHook {
-    function beforeSwap(
-        address sender,
-        PoolKey calldata key,
-        SwapParams calldata params,
-        bytes calldata hookData
-    )
+    function beforeSwap(address sender, PoolKey calldata key, SwapParams calldata params, bytes calldata hookData)
         external
         returns (bytes4, BeforeSwapDelta memory, uint24);
 }

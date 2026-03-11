@@ -62,11 +62,7 @@ contract LongTailHookV4 is IHooks {
 
     /// @notice Emitted when suspicious activity is detected for a trader.
     event SuspiciousActivity(
-        PoolId indexed id,
-        address indexed trader,
-        uint32 tradesInWindow,
-        uint128 volumeInWindow,
-        uint64 highFeeUntil
+        PoolId indexed id, address indexed trader, uint32 tradesInWindow, uint128 volumeInWindow, uint64 highFeeUntil
     );
 
     /// @notice PoolManager instance this hook is bound to.
@@ -134,13 +130,7 @@ contract LongTailHookV4 is IHooks {
         });
 
         emit PoolConfigUpdated(
-            id,
-            baseFee,
-            largeTradeFee,
-            lowLiquidityFee,
-            smallTradeSize,
-            largeTradeSize,
-            lowLiquidityThreshold
+            id, baseFee, largeTradeFee, lowLiquidityFee, smallTradeSize, largeTradeSize, lowLiquidityThreshold
         );
     }
 
@@ -226,11 +216,11 @@ contract LongTailHookV4 is IHooks {
     }
 
     /// @notice Liquidity-aware fee via StateLibrary + PoolId.
-    function _computeLiquidityFee(
-        PoolKey calldata key,
-        PoolId id,
-        PoolConfig memory config
-    ) internal view returns (uint24) {
+    function _computeLiquidityFee(PoolKey calldata key, PoolId id, PoolConfig memory config)
+        internal
+        view
+        returns (uint24)
+    {
         if (config.lowLiquidityThreshold == 0) return 0;
 
         uint128 liq = StateLibrary.getLiquidity(manager, id);
@@ -242,11 +232,10 @@ contract LongTailHookV4 is IHooks {
     }
 
     /// @notice Velocity-based anti-manipulation surcharge.
-    function _updateTraderAndComputeVelocityFee(
-        PoolId id,
-        address trader,
-        uint256 tradeSize
-    ) internal returns (uint24) {
+    function _updateTraderAndComputeVelocityFee(PoolId id, address trader, uint256 tradeSize)
+        internal
+        returns (uint24)
+    {
         VelocityConfig memory vcfg = velocityConfig;
         TraderStats storage stats = traderStats[id][trader];
 
@@ -289,12 +278,12 @@ contract LongTailHookV4 is IHooks {
         revert HookNotImplemented();
     }
 
-    function beforeAddLiquidity(
-        address,
-        PoolKey calldata,
-        IPoolManager.ModifyLiquidityParams calldata,
-        bytes calldata
-    ) external pure override returns (bytes4) {
+    function beforeAddLiquidity(address, PoolKey calldata, IPoolManager.ModifyLiquidityParams calldata, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4)
+    {
         revert HookNotImplemented();
     }
 
@@ -329,33 +318,30 @@ contract LongTailHookV4 is IHooks {
         revert HookNotImplemented();
     }
 
-    function afterSwap(
-        address,
-        PoolKey calldata,
-        IPoolManager.SwapParams calldata,
-        BalanceDelta,
-        bytes calldata
-    ) external pure override returns (bytes4, int128) {
+    function afterSwap(address, PoolKey calldata, IPoolManager.SwapParams calldata, BalanceDelta, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4, int128)
+    {
         revert HookNotImplemented();
     }
 
-    function beforeDonate(
-        address,
-        PoolKey calldata,
-        uint256,
-        uint256,
-        bytes calldata
-    ) external pure override returns (bytes4) {
+    function beforeDonate(address, PoolKey calldata, uint256, uint256, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4)
+    {
         revert HookNotImplemented();
     }
 
-    function afterDonate(
-        address,
-        PoolKey calldata,
-        uint256,
-        uint256,
-        bytes calldata
-    ) external pure override returns (bytes4) {
+    function afterDonate(address, PoolKey calldata, uint256, uint256, bytes calldata)
+        external
+        pure
+        override
+        returns (bytes4)
+    {
         revert HookNotImplemented();
     }
 }
