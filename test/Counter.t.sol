@@ -52,11 +52,7 @@ contract LongTailHookTest is Test {
     }
 
     function _doSwap(uint256 size) internal returns (BeforeSwapDelta memory, uint24 feeBps) {
-        SwapParams memory params = SwapParams({
-            zeroForOne: true,
-            amountSpecified: int256(size),
-            sqrtPriceLimitX96: 0
-        });
+        SwapParams memory params = SwapParams({zeroForOne: true, amountSpecified: int256(size), sqrtPriceLimitX96: 0});
 
         (bytes4 selector, BeforeSwapDelta memory delta, uint24 fee) =
             hook.beforeSwap(trader, poolKey, params, bytes(""));
