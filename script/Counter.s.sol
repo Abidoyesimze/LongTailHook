@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 import {Script} from "forge-std/Script.sol";
-import {LongTailHook} from "../src/LongTailHook.sol";
-import {IPoolManagerMinimal} from "../src/ILongTailHookTypes.sol";
+import {IPoolManager} from "lib/v4-core/src/interfaces/IPoolManager.sol";
+import {LongTailHookV4} from "../src/LongTailHookV4.sol";
 
-/// @notice Example deployment script for LongTailHook.
-contract LongTailHookScript is Script {
-    LongTailHook public hook;
+/// @notice Example deployment script for LongTailHookV4 with a real v4 PoolManager.
+contract LongTailHookV4Script is Script {
+    LongTailHookV4 public hook;
 
     function setUp() public {}
 
@@ -15,8 +15,8 @@ contract LongTailHookScript is Script {
         vm.startBroadcast();
 
         // NOTE: replace with the actual PoolManager address when deploying against a real v4 instance.
-        IPoolManagerMinimal poolManager = IPoolManagerMinimal(address(0xDEAD));
-        hook = new LongTailHook(poolManager, msg.sender);
+        IPoolManager poolManager = IPoolManager(address(0xDEAD));
+        hook = new LongTailHookV4(poolManager, msg.sender);
 
         vm.stopBroadcast();
     }
