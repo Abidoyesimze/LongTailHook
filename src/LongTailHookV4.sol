@@ -193,7 +193,10 @@ contract LongTailHookV4 is IHooks {
     // ========= Internal helpers =========
 
     function _normalizedTradeSize(int256 amountSpecified) internal pure returns (uint256) {
-        return amountSpecified >= 0 ? uint256(amountSpecified) : uint256(-amountSpecified);
+        // `-type(int256).min` overflows, so handle it explicitly.
+        if (amountSpecified >= 0) return uint256(amountSpecified);
+        if (amountSpecified == type(int256).min) return uint256(1) << 255; // abs(-2^255) = 2^255
+        return uint256(-amountSpecified);
     }
 
     /// @notice Adaptive fee based on trade size bands.
