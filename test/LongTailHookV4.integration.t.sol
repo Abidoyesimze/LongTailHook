@@ -41,16 +41,16 @@ contract LongTailHookV4IntegrationTest is Test, Deployers {
         hook = LongTailHookV4(_deployHookWithBeforeSwapFlag());
 
         // Create a dynamic-fee pool bound to our hook.
-        (key,) = initPoolAndAddLiquidity(currency0, currency1, IHooks(address(hook)), LPFeeLibrary.DYNAMIC_FEE_FLAG, SQRT_PRICE_1_1);
+        (key,) = initPoolAndAddLiquidity(
+            currency0, currency1, IHooks(address(hook)), LPFeeLibrary.DYNAMIC_FEE_FLAG, SQRT_PRICE_1_1
+        );
     }
 
     function _deployHookWithBeforeSwapFlag() internal returns (address hookAddr) {
         Create2Deployer deployer = new Create2Deployer();
 
-        bytes memory initCode = abi.encodePacked(
-            type(LongTailHookV4).creationCode,
-            abi.encode(IPoolManager(address(manager)), hookAdmin)
-        );
+        bytes memory initCode =
+            abi.encodePacked(type(LongTailHookV4).creationCode, abi.encode(IPoolManager(address(manager)), hookAdmin));
         bytes32 initCodeHash = keccak256(initCode);
 
         // Find a salt that yields an address with BEFORE_SWAP permission bit set.
@@ -64,7 +64,10 @@ contract LongTailHookV4IntegrationTest is Test, Deployers {
             // Only allow hook to call `beforeSwap` (and optionally parse its returned delta as well).
             // Any other flag combination can make `isValidHookAddress()` fail or trigger callbacks
             // that this hook intentionally reverts.
-            if (lowBits == Hooks.BEFORE_SWAP_FLAG || lowBits == (Hooks.BEFORE_SWAP_FLAG | Hooks.BEFORE_SWAP_RETURNS_DELTA_FLAG)) {
+            if (
+                lowBits == Hooks.BEFORE_SWAP_FLAG
+                    || lowBits == (Hooks.BEFORE_SWAP_FLAG | Hooks.BEFORE_SWAP_RETURNS_DELTA_FLAG)
+            ) {
                 hookAddr = deployer.deploy(initCode, salt);
                 return hookAddr;
             }
@@ -78,15 +81,11 @@ contract LongTailHookV4IntegrationTest is Test, Deployers {
     }
 
     function _swapWithAmount(int256 amountSpecified) internal {
-        PoolSwapTest.TestSettings memory testSettings = PoolSwapTest.TestSettings({
-            takeClaims: false,
-            settleUsingBurn: false
-        });
+        PoolSwapTest.TestSettings memory testSettings =
+            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
 
         IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
-            zeroForOne: true,
-            amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: SQRT_PRICE_1_2
+            zeroForOne: true, amountSpecified: amountSpecified, sqrtPriceLimitX96: SQRT_PRICE_1_2
         });
 
         swapRouter.swap(key, params, testSettings, ZERO_BYTES);

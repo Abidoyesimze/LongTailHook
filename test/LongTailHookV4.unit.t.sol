@@ -49,19 +49,19 @@ contract LongTailHookV4UnitTest is Test {
     }
 
     function _doBeforeSwapWithAmount(int256 amountSpecified) internal returns (BeforeSwapDelta, uint24) {
-        IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
-            zeroForOne: true,
-            amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: 0
-        });
+        IPoolManager.SwapParams memory params =
+            IPoolManager.SwapParams({zeroForOne: true, amountSpecified: amountSpecified, sqrtPriceLimitX96: 0});
 
         // `beforeSwap` is protected by `onlyPoolManager`
         vm.prank(address(mockManager));
-        (bytes4 selector, BeforeSwapDelta delta, uint24 overrideFee) =
-            hook.beforeSwap(sender, key, params, bytes(""));
+        (bytes4 selector, BeforeSwapDelta delta, uint24 overrideFee) = hook.beforeSwap(sender, key, params, bytes(""));
 
         assertEq(selector, hook.beforeSwap.selector, "hook selector mismatch");
-        assertEq(BeforeSwapDelta.unwrap(delta), BeforeSwapDelta.unwrap(BeforeSwapDeltaLibrary.ZERO_DELTA), "hook delta should be zero");
+        assertEq(
+            BeforeSwapDelta.unwrap(delta),
+            BeforeSwapDelta.unwrap(BeforeSwapDeltaLibrary.ZERO_DELTA),
+            "hook delta should be zero"
+        );
         assertEq(overrideFee, 0, "override fee return value should be zero");
         return (delta, overrideFee);
     }

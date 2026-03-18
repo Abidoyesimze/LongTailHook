@@ -22,7 +22,13 @@ contract MockPoolManagerV4Minimal {
         lastUpdatedFee = newDynamicLPFee;
     }
 
-    function extsload(bytes32 /*slot*/) external view returns (bytes32 value) {
+    function extsload(
+        bytes32 /*slot*/
+    )
+        external
+        view
+        returns (bytes32 value)
+    {
         // `StateLibrary.getLiquidity()` does `uint128(uint256(manager.extsload(slot)))`.
         value = bytes32(uint256(liquidity));
     }

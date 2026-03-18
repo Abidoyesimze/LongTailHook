@@ -60,7 +60,15 @@ contract LongTailHookTest is Test {
         uint128 lowLiquidityThreshold
     ) internal {
         vm.startPrank(admin);
-        hook.setPoolConfig(poolKey, baseFeeBps, largeTradeFeeBps, lowLiquidityFeeBps, smallTradeSize, largeTradeSize, lowLiquidityThreshold);
+        hook.setPoolConfig(
+            poolKey,
+            baseFeeBps,
+            largeTradeFeeBps,
+            lowLiquidityFeeBps,
+            smallTradeSize,
+            largeTradeSize,
+            lowLiquidityThreshold
+        );
         vm.stopPrank();
     }
 
@@ -89,7 +97,7 @@ contract LongTailHookTest is Test {
         SwapParams memory params =
             SwapParams({zeroForOne: true, amountSpecified: amountSpecified, sqrtPriceLimitX96: 0});
 
-        (bytes4 selector, , uint24 fee) = hook.beforeSwap(trader, poolKey, params, bytes(""));
+        (bytes4 selector,, uint24 fee) = hook.beforeSwap(trader, poolKey, params, bytes(""));
         assertEq(selector, hook.beforeSwap.selector, "selector mismatch");
         return fee;
     }
